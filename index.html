@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Farewell to Remember</title>
+    <style>
+        :root {
+            /* Color Palette: Elegant, Warm, Nostalgic */
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff9a9e;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --input-bg: #f8f9fa;
+            --shadow-soft: 0 10px 40px -10px rgba(0,0,0,0.1);
+            --shadow-hover: 0 20px 50px -10px rgba(0,0,0,0.15);
+            --transition-speed: 0.4s;
+            --radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+
+        body, input, textarea, button {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Decorative Background Elements */
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(80px);
+            animation: float 10s infinite ease-in-out;
+            opacity: 0.6;
+        }
+        .shape-1 { width: 300px; height: 300px; background: var(--accent); top: -50px; left: -50px; }
+        .shape-2 { width: 400px; height: 400px; background: var(--primary); bottom: -100px; right: -100px; animation-delay: 2s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -20px); }
+        }
+
+        /* Main Container */
+        .card-container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.6);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Progress Bar */
+        .progress-wrapper {
+            margin-bottom: 30px;
+        }
+        .progress-text {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .progress-track {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 25%; /* Adjusted for 4 steps */
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Steps Management */
+        .step {
+            display: none;
+            animation: fadeUp 0.6s ease forwards;
+        }
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-family: 'Georgia', serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: -webkit-linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: color 0.3s;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid transparent;
+            background: var(--input-bg);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+            color: var(--text-main);
+        }
+
+        input:focus, textarea:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(106, 17, 203, 0.1);
+        }
+
+        textarea {
+            resize: none;
+            overflow: hidden;
+            min-height: 100px;
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        textarea:focus + .char-count {
+            opacity: 1;
+        }
+
+        /* Sticker/Emoji Selector */
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .sticker-btn {
+            background: var(--input-bg);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            height: 70px;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .sticker-btn:hover {
+            transform: scale(1.1);
+            background: #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .sticker-btn.selected {
+            background: rgba(106, 17, 203, 0.05);
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .sticker-btn.selected::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-prev {
+            background: transparent;
+            color: var(--text-muted);
+        }
+        .btn-prev:hover {
+            color: var(--text-main);
+            background: rgba(0,0,0,0.03);
+        }
+
+        .btn-next, .btn-submit {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Disabled State for Next Button */
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        .btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 117, 252, 0.4);
+        }
+        
+        .btn:not(:disabled):active {
+            transform: translateY(0);
+        }
+
+        /* Success Message */
+        .success-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+        
+        .success-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .success-title {
+            font-family: 'Georgia', serif;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .success-msg {
+            color: var(--text-muted);
+            max-width: 80%;
+            line-height: 1.6;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Validation Feedback */
+        .error-shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ff6b6b !important;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card-container { padding: 25px; }
+            h2 { font-size: 1.6rem; }
+            .sticker-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+            .sticker-btn { height: 60px; font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div class="card-container">
+        <!-- Progress Indicator -->
+        <div class="progress-wrapper" id="progress-wrapper">
+            <div class="progress-text" id="progress-text">Step 1 of 4</div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- FORM ACTION SET TO FORMSPREE -->
+        <form id="farewell-form" onsubmit="return false;">
+            
+            <!-- PAGE 1: Teacher Identity -->
+            <div class="step active" id="step-1">
+                <h2>How would you like us to remember you?</h2>
+                <p class="subtitle">Let's make sure we carry the best parts of you forward.</p>
+                
+                <div class="form-group">
+                    <label for="teacherName">Your name — the one we’ll always remember</label>
+                    <input type="text" id="teacherName" name="teacherName" placeholder="e.g. The one who taught with a smile" autocomplete="name">
+                </div>
+
+                <div class="form-group">
+                    <label for="nickname">What should we call you when we talk about school days?</label>
+                    <input type="text" id="nickname" name="nickname" placeholder="That name that made us everyone laugh...">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">A way to stay in touch (optional)</label>
+                    <input type="tel" id="phone" name="phone" placeholder="For Emergency Purposes Only...">
+                </div>
+
+                <div class="btn-group" style="justify-content: flex-end;">
+                    <button type="button" class="btn btn-next" id="btn-next-1" disabled>Two Headache Level ➝</button>
+                </div>
+            </div>
+
+            <!-- PAGE 2: Fun & Thoughtful -->
+            <div class="step" id="step-2">
+                <h2>Reflections & Real Talk</h2>
+                <p class="subtitle">Be honest, we can take it (we promise not to tell).</p>
+
+                <div class="form-group">
+                    <label>One lesson that matters more than marks</label>
+                    <textarea id="review" name="review" placeholder="It wasn't in the syllabus, but you taught it anyway..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>One thing we did that made you smile</label>
+                    <textarea id="advice" name="advice" placeholder="Even if you didn't show it at the time..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Your honest reaction when you think about this batch</label>
+                    <div class="sticker-grid" id="sticker-container">
+                        <button type="button" class="sticker-btn" data-val="proud">🎓</button>
+                        <button type="button" class="sticker-btn" data-val="happy">😂</button>
+                        <button type="button" class="sticker-btn" data-val="crying">🥹</button>
+                        <button type="button" class="sticker-btn" data-val="free">🕊️</button>
+                    </div>
+                    <!-- Hidden input to store the feeling value -->
+                    <input type="hidden" id="feeling" name="feeling">
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-prev" onclick="goToStep(1)">Previous Headache</button>
+                    <button type="button" class="btn btn-next" id="btn-next-2" disabled>Next Level ➝</button>
+                </div>
+            </div>
+
+            <!-- PAGE 3: Batch Trivia (NEW PAGE) -->
+            <div class="step" id="step-3">
+                <h2>Batch Trivia</h2>
+                <p class="subtitle">The moments that defined us (or at least made us laugh).</p>
+
+                <div class="form-group">
+                    <label for="excuse">One excuse we used too often 😅</label>
+                    <textarea id="excuse" name="excuse" placeholder="e.g. My dog ate my homework... in 2024"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="commonDialogue">Most common student dialogue you heard from us</label>
+                    <input type="text" id="commonDialogue" name="commonDialogue" placeholder="e.g. 'Is this on the test?'">
+                </div>
+
+                <div class="form-group">
+                    <label for="movieTitle">If this batch were a movie title, what would it be?</label>
+                    <input type="text" id="movieTitle" name="movieTitle" placeholder="e.g. The Chaos Class">
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-prev" onclick="goToStep(2)">Back</button>
+                    <button type="button" class="btn btn-next" id="btn-next-3" disabled>Final Stretch ➝</button>
+                </div>
+            </div>
+
+            <!-- PAGE 4: Final Message (Previously Step 3) -->
+            <div class="step" id="step-4">
+                <h2>Final Words</h2>
+                <p class="subtitle">Leave a mark on our hearts before you close the door.</p>
+
+                <div class="form-group">
+                    <label for="finalMessage">Your message to us, for the road ahead</label>
+                    <textarea id="finalMessage" name="finalMessage" placeholder="Write from the heart… we’re listening." style="min-height: 150px;"></textarea>
+                    <div class="char-count"><span id="char-count-val">0</span> characters</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="blessings">One final wish for us</label>
+                    <input type="text" id="blessings" name="blessings" placeholder="e.g. May you always find your own way">
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-prev" onclick="goToStep(3)">Back</button>
+                    <button type="button" class="btn btn-submit" id="btn-submit" disabled>Finally,,,Sending with Love ❤️</button>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- Success Overlay -->
+        <div class="success-overlay" id="success-overlay">
+            <div class="success-icon">💌</div>
+            <h3 class="success-title">Your guidance stays with us</h3>
+            <p class="success-msg">Long after school ends.<br>Thank you for shaping us.</p>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ IMPORTANT: Paste your Formspree URL here
+        // Get it from: https://formspree.io/
+        const FORMSPREE_URL = "https://formspree.io/f/mlgnobgg"; 
+
+        // --- State Management ---
+        const formData = {
+            teacherName: '',
+            nickname: '',
+            phone: '',
+            review: '',
+            advice: '',
+            feeling: '',
+            excuse: '',
+            commonDialogue: '',
+            movieTitle: '',
+            finalMessage: '',
+            blessings: ''
+        };
+
+        let currentStep = 1;
+        const totalSteps = 4; // Updated to 4 steps
+        const storageKey = 'farewell_form_data';
+
+        // --- DOM Elements ---
+        const steps = [
+            document.getElementById('step-1'),
+            document.getElementById('step-2'),
+            document.getElementById('step-3'),
+            document.getElementById('step-4')
+        ];
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const progressWrapper = document.getElementById('progress-wrapper');
+        const form = document.getElementById('farewell-form');
+        
+        // Inputs
+        const inputs = {
+            teacherName: document.getElementById('teacherName'),
+            nickname: document.getElementById('nickname'),
+            phone: document.getElementById('phone'),
+            review: document.getElementById('review'),
+            advice: document.getElementById('advice'),
+            excuse: document.getElementById('excuse'),
+            commonDialogue: document.getElementById('commonDialogue'),
+            movieTitle: document.getElementById('movieTitle'),
+            finalMessage: document.getElementById('finalMessage'),
+            blessings: document.getElementById('blessings')
+        };
+        const feelingInput = document.getElementById('feeling');
+        const stickerBtns = document.querySelectorAll('.sticker-btn');
+
+        // Buttons
+        const nextBtn1 = document.getElementById('btn-next-1');
+        const nextBtn2 = document.getElementById('btn-next-2');
+        const nextBtn3 = document.getElementById('btn-next-3'); // New button
+        const submitBtn = document.getElementById('btn-submit');
+        const successOverlay = document.getElementById('success-overlay');
+        const charCountVal = document.getElementById('char-count-val');
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            attachListeners();
+            validateStep(1);
+            autoResize(inputs.finalMessage);
+            autoResize(inputs.excuse); // Auto resize for new field
+            autoResize(inputs.review);
+            autoResize(inputs.advice);
+        });
+
+        // --- Event Listeners ---
+        function attachListeners() {
+            // Input Handlers
+            Object.keys(inputs).forEach(key => {
+                const el = inputs[key];
+                if(el) {
+                    el.addEventListener('input', (e) => {
+                        handleInput(key, e.target);
+                        if(key === 'finalMessage') updateCharCount(e.target);
+                    });
+                }
+            });
+
+            // Sticker Handlers
+            stickerBtns.forEach(btn => {
+                btn.addEventListener('click', () => selectSticker(btn));
+            });
+
+            // Navigation Handlers
+            nextBtn1.addEventListener('click', () => goToStep(2));
+            nextBtn2.addEventListener('click', () => goToStep(3));
+            nextBtn3.addEventListener('click', () => goToStep(4));
+            submitBtn.addEventListener('click', sendToFormspree);
+        }
+
+        // --- Logic & Helper Functions ---
+
+        function handleInput(key, element) {
+            // Specific Logic: Auto-capitalize Name
+            if (key === 'teacherName') {
+                const val = element.value;
+                if (val.length > 0) {
+                    element.value = val.charAt(0).toUpperCase() + val.slice(1);
+                }
+            }
+
+            // Trim logic in formData
+            formData[key] = element.value.trim();
+            
+            // Save state
+            saveToStorage();
+            
+            // Validate current step
+            validateStep(currentStep);
+        }
+
+        function selectSticker(btn) {
+            // Visual update
+            stickerBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            
+            // Logic update
+            formData.feeling = btn.dataset.val;
+            // Update hidden input
+            feelingInput.value = formData.feeling;
+            saveToStorage();
+            validateStep(2);
+        }
+
+        function autoResize(textarea) {
+            if(!textarea) return;
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
+
+        function updateCharCount(textarea) {
+            charCountVal.textContent = textarea.value.length;
+        }
+
+        function validateStep(step) {
+            let isValid = false;
+
+            if (step === 1) {
+                // Required: Name only
+                isValid = formData.teacherName.length > 0;
+                toggleButton(nextBtn1, isValid);
+            } else if (step === 2) {
+                // Required: Review, Advice, Feeling
+                isValid = formData.review.length > 0 && 
+                          formData.advice.length > 0 && 
+                          formData.feeling.length > 0;
+                toggleButton(nextBtn2, isValid);
+            } else if (step === 3) {
+                // Required: Movie Title (Making at least one of the new questions required to keep flow)
+                // You can change this to 'commonDialogue' or remove the check if you want all optional.
+                isValid = formData.movieTitle.length > 0; 
+                toggleButton(nextBtn3, isValid);
+            } else if (step === 4) {
+                // Required: Final Message
+                isValid = formData.finalMessage.length > 0;
+                toggleButton(submitBtn, isValid);
+            }
+        }
+
+        function toggleButton(btn, isValid) {
+            btn.disabled = !isValid;
+        }
+
+        function goToStep(step) {
+            // Animation Handling
+            const currentStepEl = steps[currentStep - 1];
+            const nextStepEl = steps[step - 1];
+
+            // Fade Out
+            currentStepEl.style.opacity = '0';
+            currentStepEl.style.transform = 'translateY(-10px)';
+            
+            setTimeout(() => {
+                currentStepEl.classList.remove('active');
+                nextStepEl.classList.add('active');
+                
+                // Trigger reflow for animation
+                void nextStepEl.offsetWidth; 
+                
+                currentStep = step;
+                updateProgress();
+                validateStep(step); // Ensure button state is correct
+            }, 300); // Wait for CSS transition
+        }
+
+        function updateProgress() {
+            const percent = ((currentStep) / totalSteps) * 100;
+            progressFill.style.width = `${percent}%`;
+            progressText.textContent = `Step ${currentStep} of ${totalSteps}`;
+        }
+
+        async function sendToFormspree() {
+            if (!formData.finalMessage) return;
+
+            // UI Feedback
+            submitBtn.textContent = "Sending...";
+            submitBtn.disabled = true;
+
+            try {
+                // Prepare Data
+                const data = new FormData(form);
+                // Ensure all fields are included
+                Object.keys(formData).forEach(key => {
+                    data.append(key, formData[key]);
+                });
+
+                // Send Request
+                const response = await fetch(FORMSPREE_URL, {
+                    method: 'POST',
+                    body: data,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Success
+                    progressWrapper.style.display = 'none';
+                    successOverlay.classList.add('visible');
+                    localStorage.removeItem(storageKey);
+                } else {
+                    // Error from Formspree
+                    const errorData = await response.json();
+                    alert("Oops! There was a problem submitting your form: " + JSON.stringify(errorData));
+                    submitBtn.textContent = "Try Again";
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Connection error. Please check your internet and try again.");
+                submitBtn.textContent = "Try Again";
+                submitBtn.disabled = false;
+            }
+        }
+
+        // --- LocalStorage Functions ---
+
+        function saveToStorage() {
+            localStorage.setItem(storageKey, JSON.stringify(formData));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem(storageKey);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                
+                // Merge saved data with formData structure
+                Object.assign(formData, parsed);
+
+                // Populate Inputs
+                Object.keys(inputs).forEach(key => {
+                    if (inputs[key] && formData[key]) {
+                        inputs[key].value = formData[key];
+                    }
+                });
+
+                // Populate Stickers
+                if (formData.feeling) {
+                    feelingInput.value = formData.feeling;
+                    const activeBtn = document.querySelector(`.sticker-btn[data-val="${formData.feeling}"]`);
+                    if (activeBtn) activeBtn.classList.add('selected');
+                }
+
+                // Update Char Count if data exists
+                if (formData.finalMessage) {
+                    charCountVal.textContent = formData.finalMessage.length;
+                }
+            }
+        }
+
+    </script>
+</body>
+</html>
