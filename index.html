@@ -37,8 +37,8 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            align-items: center; /* Centers vertically if content is short */
+            padding: 40px 20px; /* More padding */
             color: var(--text-main);
             overflow-x: hidden;
         }
@@ -65,14 +65,20 @@
             background: var(--card-bg);
             width: 100%;
             max-width: 600px;
+            
+            /* SCROLL FIX REMOVED: Removed max-height and fixed display flex 
+               allowing the card to grow naturally with content */
+            height: auto; 
+            
             border-radius: var(--radius);
             box-shadow: var(--shadow-soft);
             padding: 40px;
             position: relative;
-            overflow: hidden;
+            overflow: visible; /* Let content flow out */
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.6);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 40px;
         }
 
         /* Progress Bar */
@@ -97,7 +103,7 @@
         }
         .progress-fill {
             height: 100%;
-            width: 25%; /* Adjusted for 4 steps */
+            width: 16.66%; /* 100% / 6 steps */
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             border-radius: 10px;
             transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1);
@@ -107,7 +113,9 @@
         .step {
             display: none;
             animation: fadeUp 0.6s ease forwards;
+            /* Removed overflow-y and flex-grow constraints */
         }
+
         .step.active {
             display: block;
         }
@@ -172,6 +180,20 @@
             overflow: hidden;
             min-height: 100px;
         }
+        
+        /* Specific Styles for the "Silent Truth" */
+        .confidential-input {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0,0,0,0.05);
+            font-style: italic;
+        }
+        .helper-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-style: italic;
+            opacity: 0.8;
+        }
 
         .char-count {
             text-align: right;
@@ -229,11 +251,102 @@
             border-radius: 50%;
         }
 
+        /* --- Custom Range Slider Styling --- */
+        .range-container {
+            margin-top: 15px;
+            padding: 10px 0;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        
+        input[type=range]:focus {
+            outline: none;
+            box-shadow: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 10px rgba(106, 17, 203, 0.5);
+            transition: transform 0.2s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #e0e0e0;
+            border-radius: 2px;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .slider-feedback {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- Reflection Reveal (Time Based since no scroll) --- */
+        .reflection-zone {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px dashed rgba(0,0,0,0.1);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1.5s ease;
+        }
+
+        .reflection-zone.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .micro-text {
+            font-size: 0.85rem;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
         /* Buttons */
         .btn-group {
             display: flex;
             justify-content: space-between;
             margin-top: 40px;
+            width: 100%;
         }
 
         .btn {
@@ -297,6 +410,8 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.8s ease;
+            /* Ensure overlay covers the expanded height */
+            min-height: 100%; 
         }
         
         .success-overlay.visible {
@@ -329,21 +444,11 @@
             100% { transform: scale(1); }
         }
 
-        /* Validation Feedback */
-        .error-shake {
-            animation: shake 0.4s ease-in-out;
-            border-color: #ff6b6b !important;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
         /* Responsive */
         @media (max-width: 480px) {
-            .card-container { padding: 25px; }
+            .card-container { 
+                padding: 25px; 
+            }
             h2 { font-size: 1.6rem; }
             .sticker-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
             .sticker-btn { height: 60px; font-size: 1.5rem; }
@@ -358,7 +463,7 @@
     <div class="card-container">
         <!-- Progress Indicator -->
         <div class="progress-wrapper" id="progress-wrapper">
-            <div class="progress-text" id="progress-text">Step 1 of 4</div>
+            <div class="progress-text" id="progress-text">Step 1 of 6</div>
             <div class="progress-track">
                 <div class="progress-fill" id="progress-fill"></div>
             </div>
@@ -388,7 +493,7 @@
                 </div>
 
                 <div class="btn-group" style="justify-content: flex-end;">
-                    <button type="button" class="btn btn-next" id="btn-next-1" disabled>Two Headache Level ➝</button>
+                    <button type="button" class="btn btn-next" id="btn-next-1" disabled>Some More Headache Level ➝</button>
                 </div>
             </div>
 
@@ -421,23 +526,23 @@
 
                 <div class="btn-group">
                     <button type="button" class="btn btn-prev" onclick="goToStep(1)">Previous Headache</button>
-                    <button type="button" class="btn btn-next" id="btn-next-2" disabled>Next Level ➝</button>
+                    <button type="button" class="btn btn-next" id="btn-next-2" disabled>Next Headache Level➝</button>
                 </div>
             </div>
 
-            <!-- PAGE 3: Batch Trivia (NEW PAGE) -->
+            <!-- PAGE 3: Batch Trivia -->
             <div class="step" id="step-3">
                 <h2>Batch Trivia</h2>
                 <p class="subtitle">The moments that defined us (or at least made us laugh).</p>
 
                 <div class="form-group">
                     <label for="excuse">One excuse we used too often 😅</label>
-                    <textarea id="excuse" name="excuse" placeholder="e.g. My dog ate my homework... in 2024"></textarea>
+                    <textarea id="excuse" name="excuse" placeholder="e.g. Friend took my notebook...(who didn't came that day....)"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="commonDialogue">Most common student dialogue you heard from us</label>
-                    <input type="text" id="commonDialogue" name="commonDialogue" placeholder="e.g. 'Is this on the test?'">
+                    <input type="text" id="commonDialogue" name="commonDialogue" placeholder="e.g. sir/ma'am, may I go to the washroom?....">
                 </div>
 
                 <div class="form-group">
@@ -446,13 +551,77 @@
                 </div>
 
                 <div class="btn-group">
-                    <button type="button" class="btn btn-prev" onclick="goToStep(2)">Back</button>
-                    <button type="button" class="btn btn-next" id="btn-next-3" disabled>Final Stretch ➝</button>
+                    <button type="button" class="btn btn-prev" onclick="goToStep(2)">Previous Headache Level</button>
+                    <button type="button" class="btn btn-next" id="btn-next-3" disabled>Ahhh Two More ➝</button>
                 </div>
             </div>
 
-            <!-- PAGE 4: Final Message (Previously Step 3) -->
+            <!-- PAGE 4: THE UNSPOKEN LEGACY (PART 1) -->
             <div class="step" id="step-4">
+                <div style="padding-bottom: 20px;">
+                    <h2>The Unspoken Legacy</h2>
+                    <p class="subtitle">Pause for a moment. This is about the connection beyond the curriculum.</p>
+                    
+                    <!-- Silent Truth -->
+                    <div class="form-group">
+                        <label for="silentTruth">The Silent Truth</label>
+                        <textarea id="silentTruth" name="silentTruth" class="confidential-input" placeholder="Something you always wanted to say to this batch, but never did..."></textarea>
+                        <div class="helper-text">This is strictly confidential and safe.</div>
+                    </div>
+
+                    <!-- Memory Trigger -->
+                    <div class="form-group">
+                        <label for="memoryTrigger">A Memory to Hold Close</label>
+                        <textarea id="memoryTrigger" name="memoryTrigger" placeholder="One specific moment with this batch you'll replay in your mind years from now..."></textarea>
+                    </div>
+
+                    <!-- Time-Based Reveal Zone -->
+                    <div class="reflection-zone" id="reflection-zone-1">
+                        <div class="micro-text">✨ Take your time. This part matters. ✨</div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-prev" onclick="goToStep(3)">Previous Annoying Level</button>
+                    <button type="button" class="btn btn-next" id="btn-next-4" disabled>Take a break from emotions</button>
+                </div>
+            </div>
+
+            <!-- PAGE 5: THE UNSPOKEN LEGACY (PART 2) - NEW PAGE -->
+            <div class="step" id="step-5">
+                <div style="padding-bottom: 20px;">
+                    <h2>The Teacher Vibe</h2>
+                    <p class="subtitle">Let's be playful about the journey we just took.</p>
+                    
+                    <!-- Difficulty Slider -->
+                    <div class="form-group">
+                        <label>The "Challenge Level" of this Class</label>
+                        <div class="slider-feedback" id="slider-emoji">☕️</div>
+                        <div class="range-container">
+                            <input type="range" id="difficultyLevel" name="difficultyLevel" min="0" max="100" value="0" step="1">
+                            <div class="slider-labels">
+                                <span>A Breeze</span>
+                                <span>Fun Chaos</span>
+                                <span>Legendary</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Teacher Superpower -->
+                    <div class="form-group">
+                        <label for="superpower">If you had a teacher superpower for this batch, what was it?</label>
+                        <input type="text" id="superpower" name="superpower" placeholder="e.g. The Power of Patience, Mind-Reading Homework...">
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-prev" onclick="goToStep(4)">That break </button>
+                    <button type="button" class="btn btn-next" id="btn-next-5" disabled>A last frustating Level➝</button>
+                </div>
+            </div>
+
+            <!-- PAGE 6: Final Message -->
+            <div class="step" id="step-6">
                 <h2>Final Words</h2>
                 <p class="subtitle">Leave a mark on our hearts before you close the door.</p>
 
@@ -468,7 +637,7 @@
                 </div>
 
                 <div class="btn-group">
-                    <button type="button" class="btn btn-prev" onclick="goToStep(3)">Back</button>
+                    <button type="button" class="btn btn-prev" onclick="goToStep(5)">That emotional damage</button>
                     <button type="button" class="btn btn-submit" id="btn-submit" disabled>Finally,,,Sending with Love ❤️</button>
                 </div>
             </div>
@@ -478,8 +647,8 @@
         <!-- Success Overlay -->
         <div class="success-overlay" id="success-overlay">
             <div class="success-icon">💌</div>
-            <h3 class="success-title">Your guidance stays with us</h3>
-            <p class="success-msg">Long after school ends.<br>Thank you for shaping us.</p>
+            <h3 class="success-title">Thank you for leaving a part of yourself with us.</h3>
+            <p class="success-msg">We carry your words forward<br>further than you may ever see.</p>
         </div>
     </div>
 
@@ -499,12 +668,16 @@
             excuse: '',
             commonDialogue: '',
             movieTitle: '',
+            silentTruth: '',
+            memoryTrigger: '',
+            difficultyLevel: '0',
+            superpower: '',
             finalMessage: '',
             blessings: ''
         };
 
         let currentStep = 1;
-        const totalSteps = 4; // Updated to 4 steps
+        const totalSteps = 6; // Updated to 6 steps
         const storageKey = 'farewell_form_data';
 
         // --- DOM Elements ---
@@ -512,7 +685,9 @@
             document.getElementById('step-1'),
             document.getElementById('step-2'),
             document.getElementById('step-3'),
-            document.getElementById('step-4')
+            document.getElementById('step-4'),
+            document.getElementById('step-5'),
+            document.getElementById('step-6')
         ];
         const progressFill = document.getElementById('progress-fill');
         const progressText = document.getElementById('progress-text');
@@ -529,16 +704,24 @@
             excuse: document.getElementById('excuse'),
             commonDialogue: document.getElementById('commonDialogue'),
             movieTitle: document.getElementById('movieTitle'),
+            silentTruth: document.getElementById('silentTruth'),
+            memoryTrigger: document.getElementById('memoryTrigger'),
+            difficultyLevel: document.getElementById('difficultyLevel'),
+            superpower: document.getElementById('superpower'),
             finalMessage: document.getElementById('finalMessage'),
             blessings: document.getElementById('blessings')
         };
         const feelingInput = document.getElementById('feeling');
         const stickerBtns = document.querySelectorAll('.sticker-btn');
+        const sliderEmoji = document.getElementById('slider-emoji');
+        const reflectionZone1 = document.getElementById('reflection-zone-1');
 
         // Buttons
         const nextBtn1 = document.getElementById('btn-next-1');
         const nextBtn2 = document.getElementById('btn-next-2');
-        const nextBtn3 = document.getElementById('btn-next-3'); // New button
+        const nextBtn3 = document.getElementById('btn-next-3'); 
+        const nextBtn4 = document.getElementById('btn-next-4'); // Legacy 1 -> Legacy 2
+        const nextBtn5 = document.getElementById('btn-next-5'); // Legacy 2 -> Final
         const submitBtn = document.getElementById('btn-submit');
         const successOverlay = document.getElementById('success-overlay');
         const charCountVal = document.getElementById('char-count-val');
@@ -548,10 +731,13 @@
             loadFromStorage();
             attachListeners();
             validateStep(1);
+            // Auto resize textareas
             autoResize(inputs.finalMessage);
-            autoResize(inputs.excuse); // Auto resize for new field
+            autoResize(inputs.excuse);
             autoResize(inputs.review);
             autoResize(inputs.advice);
+            autoResize(inputs.silentTruth);
+            autoResize(inputs.memoryTrigger);
         });
 
         // --- Event Listeners ---
@@ -576,7 +762,14 @@
             nextBtn1.addEventListener('click', () => goToStep(2));
             nextBtn2.addEventListener('click', () => goToStep(3));
             nextBtn3.addEventListener('click', () => goToStep(4));
+            nextBtn4.addEventListener('click', () => goToStep(5));
+            nextBtn5.addEventListener('click', () => goToStep(6));
             submitBtn.addEventListener('click', sendToFormspree);
+
+            // Slider Handler
+            if(inputs.difficultyLevel) {
+                inputs.difficultyLevel.addEventListener('input', updateSliderReaction);
+            }
         }
 
         // --- Logic & Helper Functions ---
@@ -613,6 +806,28 @@
             validateStep(2);
         }
 
+        function updateSliderReaction(e) {
+            const val = parseInt(e.target.value);
+            formData.difficultyLevel = val;
+            saveToStorage();
+            
+            // Visual feedback based on value
+            let emoji = '☕️'; // Default
+            if (val > 20 && val <= 40) emoji = '😅';
+            if (val > 40 && val <= 60) emoji = '🤯';
+            if (val > 60 && val <= 80) emoji = '🔥';
+            if (val > 80) emoji = '🏆';
+
+            sliderEmoji.textContent = emoji;
+            
+            // Reset animation
+            sliderEmoji.style.animation = 'none';
+            sliderEmoji.offsetHeight; /* trigger reflow */
+            sliderEmoji.style.animation = 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+
+            validateStep(5); 
+        }
+
         function autoResize(textarea) {
             if(!textarea) return;
             textarea.addEventListener('input', function() {
@@ -629,22 +844,25 @@
             let isValid = false;
 
             if (step === 1) {
-                // Required: Name only
                 isValid = formData.teacherName.length > 0;
                 toggleButton(nextBtn1, isValid);
             } else if (step === 2) {
-                // Required: Review, Advice, Feeling
                 isValid = formData.review.length > 0 && 
                           formData.advice.length > 0 && 
                           formData.feeling.length > 0;
                 toggleButton(nextBtn2, isValid);
             } else if (step === 3) {
-                // Required: Movie Title (Making at least one of the new questions required to keep flow)
-                // You can change this to 'commonDialogue' or remove the check if you want all optional.
                 isValid = formData.movieTitle.length > 0; 
                 toggleButton(nextBtn3, isValid);
             } else if (step === 4) {
-                // Required: Final Message
+                // Validation: Enable next button if they wrote something in either field
+                isValid = formData.silentTruth.length > 0 || formData.memoryTrigger.length > 0;
+                toggleButton(nextBtn4, isValid);
+            } else if (step === 5) {
+                // Validation: Slider must be moved
+                isValid = parseInt(formData.difficultyLevel) > 0;
+                toggleButton(nextBtn5, isValid);
+            } else if (step === 6) {
                 isValid = formData.finalMessage.length > 0;
                 toggleButton(submitBtn, isValid);
             }
@@ -667,12 +885,23 @@
                 currentStepEl.classList.remove('active');
                 nextStepEl.classList.add('active');
                 
+                // Reset Reveal Zones
+                if(currentStep === 4) reflectionZone1.classList.remove('visible');
+                
                 // Trigger reflow for animation
                 void nextStepEl.offsetWidth; 
                 
                 currentStep = step;
                 updateProgress();
-                validateStep(step); // Ensure button state is correct
+                validateStep(step); 
+
+                // Handle Time-Based Reveal for Step 4
+                if(currentStep === 4) {
+                    setTimeout(() => {
+                        reflectionZone1.classList.add('visible');
+                    }, 1000); // Show after 1 second
+                }
+
             }, 300); // Wait for CSS transition
         }
 
@@ -744,6 +973,8 @@
                 Object.keys(inputs).forEach(key => {
                     if (inputs[key] && formData[key]) {
                         inputs[key].value = formData[key];
+                        // Trigger input event to resize textareas if needed
+                        inputs[key].dispatchEvent(new Event('input'));
                     }
                 });
 
@@ -754,9 +985,11 @@
                     if (activeBtn) activeBtn.classList.add('selected');
                 }
 
-                // Update Char Count if data exists
-                if (formData.finalMessage) {
-                    charCountVal.textContent = formData.finalMessage.length;
+                // Update Slider Visual
+                if (formData.difficultyLevel) {
+                    inputs.difficultyLevel.value = formData.difficultyLevel;
+                    // Trigger update
+                    updateSliderReaction({ target: inputs.difficultyLevel });
                 }
             }
         }
